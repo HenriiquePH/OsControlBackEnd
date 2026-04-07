@@ -27,6 +27,8 @@ public class UsuarioService {
         usuario.setLogin(usuarioAtualizado.getLogin());
         usuario.setSenha(usuarioAtualizado.getSenha());
         usuario.setPerfil(usuarioAtualizado.getPerfil());
+        usuario.setCpf(usuarioAtualizado.getCpf());
+        usuario.setTelefone(usuarioAtualizado.getTelefone());
 
         return repository.save(usuario);
     }
@@ -58,5 +60,14 @@ public class UsuarioService {
         if (usuario.getPerfil() == null) {
             throw new RuntimeException("Perfil é obrigatório.");
         }
+
+        if (usuario.getCpf() == null || usuario.getCpf().isBlank()) {
+            throw new RuntimeException("CPF é obrigatório.");
+        }
+
+        if (usuario.getTelefone() == null || usuario.getTelefone().isBlank()) {
+            throw new RuntimeException("Telefone é obrigatório.");
+        }
+
     }
 }

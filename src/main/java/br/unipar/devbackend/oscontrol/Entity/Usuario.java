@@ -14,7 +14,7 @@ import java.util.List;
 public class Usuario implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() { //Consulta quais são as Roles que o usuário tem
-        if(this.perfil == PerfilEnum.ROLE_ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USUARIOO"));
+        if(this.perfil == PerfilEnum.ROLE_ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USUARIO"));
         else return List.of(new SimpleGrantedAuthority("ROLE_USUARIO"));
     }
 
@@ -54,6 +54,12 @@ public class Usuario implements UserDetails {
 
     @Column(nullable = false)
     private String nome;
+
+    @Column(nullable = false, unique = true)
+    private String cpf;
+
+    @Column(nullable = false)
+    private String telefone;
 
     @Column(nullable = false, unique = true)
     private String login;
@@ -115,4 +121,21 @@ public class Usuario implements UserDetails {
     public void setPerfil(PerfilEnum perfil) {
         this.perfil = perfil;
     }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
 }
