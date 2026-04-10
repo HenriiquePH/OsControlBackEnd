@@ -6,9 +6,6 @@ import jakarta.persistence.*;
 @Table(name = "os_servico")
 public class OsServico {
 
-    // ==========================================
-    // ATRIBUTOS
-    // ==========================================
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,29 +22,15 @@ public class OsServico {
     @JoinColumn(name = "id_servico")
     private Servico servico;
 
-    // ==========================================
-    // CONSTRUTOR
-    // ==========================================
     public OsServico() {
     }
 
-    // ==========================================
-    // MÉTODOS DE NEGÓCIO
-    // ==========================================
-
-    /**
-     * Regra de negócio: Cálculo matemático do item.
-     * Importante para coerência com o Diagrama de Classes.
-     */
     public void calcularSubtotal() {
         double qtd = (this.quantidade != null) ? this.quantidade : 0.0;
         double valorUn = (this.valorUnitario != null) ? this.valorUnitario : 0.0;
         this.valorTotal = qtd * valorUn;
     }
 
-    // ==========================================
-    // GETTERS E SETTERS (FORMATADOS)
-    // ==========================================
     public Integer getId() {
         return id;
     }
@@ -62,7 +45,7 @@ public class OsServico {
 
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
-        calcularSubtotal(); // Atualiza o total sempre que a quantidade mudar
+        calcularSubtotal();
     }
 
     public Double getValorUnitario() {
@@ -71,7 +54,7 @@ public class OsServico {
 
     public void setValorUnitario(Double valorUnitario) {
         this.valorUnitario = valorUnitario;
-        calcularSubtotal(); // Atualiza o total sempre que o preço unitário mudar
+        calcularSubtotal();
     }
 
     public Double getValorTotal() {

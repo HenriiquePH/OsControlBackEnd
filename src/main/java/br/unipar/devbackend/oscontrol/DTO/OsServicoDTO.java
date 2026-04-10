@@ -20,7 +20,6 @@ public class OsServicoDTO {
         this.id = id;
     }
 
-
     public Integer getServicoId() {
         return servicoId;
     }
@@ -28,7 +27,6 @@ public class OsServicoDTO {
     public void setServicoId(Integer servicoId) {
         this.servicoId = servicoId;
     }
-
 
     public String getDescricaoServico() {
         return descricaoServico;
@@ -38,7 +36,6 @@ public class OsServicoDTO {
         this.descricaoServico = descricaoServico;
     }
 
-
     public Integer getQuantidade() {
         return quantidade;
     }
@@ -47,7 +44,6 @@ public class OsServicoDTO {
         this.quantidade = quantidade;
     }
 
-
     public Double getValorUnitario() {
         return valorUnitario;
     }
@@ -55,7 +51,6 @@ public class OsServicoDTO {
     public void setValorUnitario(Double valorUnitario) {
         this.valorUnitario = valorUnitario;
     }
-
 
     public Double getValorTotal() {
         return valorTotal;

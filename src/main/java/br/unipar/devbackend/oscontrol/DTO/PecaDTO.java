@@ -17,7 +17,6 @@ public class PecaDTO {
         this.id = id;
     }
 
-
     public String getDescricao() {
         return descricao;
     }
@@ -25,7 +24,6 @@ public class PecaDTO {
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
-
 
     public Double getValorUnitario() {
         return valorUnitario;

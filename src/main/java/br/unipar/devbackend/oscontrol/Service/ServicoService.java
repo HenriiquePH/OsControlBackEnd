@@ -27,6 +27,16 @@ public class ServicoService {
         return repository.save(servico);
     }
 
+    private void validarServico(Servico servico) {
+        if (servico.getDescricao() == null || servico.getDescricao().isBlank()) {
+            throw new RuntimeException("Descrição do serviço é obrigatória.");
+        }
+
+        if (servico.getValor() == null || servico.getValor() <= 0) {
+            throw new RuntimeException("Valor do serviço deve ser maior que zero.");
+        }
+    }
+
     public Servico editarServico(Servico servicoAtualizado) {
         Servico servico = buscarPorId(servicoAtualizado.getId());
 
@@ -35,10 +45,6 @@ public class ServicoService {
         if (!servico.getDescricao().equals(servicoAtualizado.getDescricao())
                 && repository.existsByDescricao(servicoAtualizado.getDescricao())) {
             throw new RuntimeException("Já existe um serviço cadastrado com este nome.");
-        }
-
-        if (osServicoRepository.existsByServicoId(servico.getId())) {
-            throw new RuntimeException("Este serviço não pode ser alterado pois está vinculado a uma OS em aberto.");
         }
 
         servico.setDescricao(servicoAtualizado.getDescricao());
@@ -60,19 +66,9 @@ public class ServicoService {
         Servico servico = buscarPorId(id);
 
         if (osServicoRepository.existsByServicoId(servico.getId())) {
-            throw new RuntimeException("Este serviço não pode ser excluído pois está vinculado a uma OS em aberto.");
+            throw new RuntimeException("Este serviço não pode ser excluído pois está vinculado a uma OS.");
         }
 
         repository.delete(servico);
-    }
-
-    private void validarServico(Servico servico) {
-        if (servico.getDescricao() == null || servico.getDescricao().isBlank()) {
-            throw new RuntimeException("Descrição do serviço é obrigatória.");
-        }
-
-        if (servico.getValor() == null || servico.getValor() <= 0) {
-            throw new RuntimeException("Valor do serviço deve ser maior que zero.");
-        }
     }
 }

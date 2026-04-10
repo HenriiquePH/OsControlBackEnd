@@ -6,9 +6,6 @@ import jakarta.persistence.*;
 @Table(name = "os_peca")
 public class OsPeca {
 
-    // ==========================================
-    // ATRIBUTOS
-    // ==========================================
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,15 +22,8 @@ public class OsPeca {
     @JoinColumn(name = "id_peca")
     private Peca peca;
 
-    // ==========================================
-    // CONSTRUTOR
-    // ==========================================
     public OsPeca() {
     }
-
-    // ==========================================
-    // MÉTODOS DE NEGÓCIO
-    // ==========================================
 
     public void calcularSubtotal() {
         double qtd = (this.quantidade != null) ? this.quantidade : 0.0;
@@ -41,30 +31,53 @@ public class OsPeca {
         this.valorTotal = qtd * valorUn;
     }
 
-    // ==========================================
-    // GETTERS E SETTERS
-    // ==========================================
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Integer getId() {
+        return id;
+    }
 
-    public Integer getQuantidade() { return quantidade; }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getQuantidade() {
+        return quantidade;
+    }
+
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
-        calcularSubtotal(); // Atualiza automaticamente
+        calcularSubtotal();
     }
 
-    public Double getValorUnitario() { return valorUnitario; }
+    public Double getValorUnitario() {
+        return valorUnitario;
+    }
+
     public void setValorUnitario(Double valorUnitario) {
         this.valorUnitario = valorUnitario;
-        calcularSubtotal(); // Atualiza automaticamente
+        calcularSubtotal();
     }
 
-    public Double getValorTotal() { return valorTotal; }
-    public void setValorTotal(Double valorTotal) { this.valorTotal = valorTotal; }
+    public Double getValorTotal() {
+        return valorTotal;
+    }
 
-    public OrdemDeServico getOs() { return os; }
-    public void setOs(OrdemDeServico os) { this.os = os; }
+    public void setValorTotal(Double valorTotal) {
+        this.valorTotal = valorTotal;
+    }
 
-    public Peca getPeca() { return peca; }
-    public void setPeca(Peca peca) { this.peca = peca; }
+    public OrdemDeServico getOs() {
+        return os;
+    }
+
+    public void setOs(OrdemDeServico os) {
+        this.os = os;
+    }
+
+    public Peca getPeca() {
+        return peca;
+    }
+
+    public void setPeca(Peca peca) {
+        this.peca = peca;
+    }
 }

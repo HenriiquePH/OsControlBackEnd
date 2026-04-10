@@ -42,15 +42,7 @@ public class OrdemDeServicoService {
     private final PecaRepository pecaRepository;
     private final ServicoRepository servicoRepository;
 
-    public OrdemDeServicoService(OrdemDeServicoRepository ordemDeServicoRepository,
-                                 OsPecaRepository osPecaRepository,
-                                 OsServicoRepository osServicoRepository,
-                                 OrcamentoService orcamentoService,
-                                 ClienteRepository clienteRepository,
-                                 VeiculoRepository veiculoRepository,
-                                 UsuarioRepository usuarioRepository,
-                                 PecaRepository pecaRepository,
-                                 ServicoRepository servicoRepository) {
+    public OrdemDeServicoService(OrdemDeServicoRepository ordemDeServicoRepository, OsPecaRepository osPecaRepository, OsServicoRepository osServicoRepository, OrcamentoService orcamentoService, ClienteRepository clienteRepository, VeiculoRepository veiculoRepository, UsuarioRepository usuarioRepository, PecaRepository pecaRepository, ServicoRepository servicoRepository) {
         this.ordemDeServicoRepository = ordemDeServicoRepository;
         this.osPecaRepository = osPecaRepository;
         this.osServicoRepository = osServicoRepository;
@@ -62,6 +54,100 @@ public class OrdemDeServicoService {
         this.servicoRepository = servicoRepository;
     }
 
+    @Transactional
+    public OrdemDeServicoDTO salvar(OrdemDeServicoDTO dto) {
+        validarDtoDeEntrada(dto);
+
+        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
+        Veiculo veiculo = veiculoRepository.findById(dto.getVeiculoId()).orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
+        Usuario tecnico = usuarioRepository.findById(dto.getTecnicoResponsavelId()).orElseThrow(() -> new RuntimeException("Técnico responsável não encontrado."));
+
+        validarClienteEVeiculo(cliente, veiculo);
+
+        OrdemDeServico novaOs = new OrdemDeServico();
+        novaOs.setObservacoes(dto.getObservacoes());
+        novaOs.setCliente(cliente);
+        novaOs.setVeiculo(veiculo);
+        novaOs.setTecnicoResponsavel(tecnico);
+        novaOs.setOrcamentoId(dto.getOrcamentoId());
+        novaOs.setDesconto(dto.getDesconto() != null ? dto.getDesconto() : 0.0);
+        novaOs.setDataAbertura(dto.getDataAbertura() != null ? dto.getDataAbertura() : java.time.LocalDateTime.now());
+        novaOs.setStatusOs(mapearStatus(dto.getStatusOs()));
+
+        OrdemDeServico osSalva = ordemDeServicoRepository.save(novaOs);
+
+        double totalPecas = salvarPecasDaOs(osSalva, dto.getPecas());
+        double totalServicos = salvarServicosDaOs(osSalva, dto.getServicos());
+
+        osSalva.setValorTotalPecas(totalPecas);
+        osSalva.setValorTotalServico(totalServicos);
+        osSalva.calcularValorTotal();
+
+        OrdemDeServico osAtualizada = ordemDeServicoRepository.save(osSalva);
+        return buscarDetalhePorId(osAtualizada.getId());
+    }
+
+    public List<OrdemDeServicoDTO> listarTodas() {
+        List<OrdemDeServico> ordens = ordemDeServicoRepository.findAll();
+        List<OrdemDeServicoDTO> lista = new ArrayList<>();
+
+        for (OrdemDeServico os : ordens) {
+            lista.add(toResumoDTO(os));
+        }
+
+        return lista;
+    }
+
+    @Transactional
+    public OrdemDeServicoDTO editar(Integer id, OrdemDeServicoDTO dto) {
+        validarDtoDeEntrada(dto);
+
+        OrdemDeServico os = buscarPorId(id);
+
+        if (os.getStatusOs() == StatusOsEnum.FECHADA) {
+            throw new RuntimeException("Não é possível editar uma OS fechada.");
+        }
+
+        Cliente cliente = clienteRepository.findById(dto.getClienteId()).orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
+        Veiculo veiculo = veiculoRepository.findById(dto.getVeiculoId()).orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
+        Usuario tecnico = usuarioRepository.findById(dto.getTecnicoResponsavelId()).orElseThrow(() -> new RuntimeException("Técnico responsável não encontrado."));
+
+        validarClienteEVeiculo(cliente, veiculo);
+
+        os.setObservacoes(dto.getObservacoes());
+        os.setCliente(cliente);
+        os.setVeiculo(veiculo);
+        os.setTecnicoResponsavel(tecnico);
+        os.setOrcamentoId(dto.getOrcamentoId());
+        os.setDesconto(dto.getDesconto() != null ? dto.getDesconto() : 0.0);
+        os.setDataAbertura(dto.getDataAbertura() != null ? dto.getDataAbertura() : os.getDataAbertura());
+        os.setStatusOs(mapearStatus(dto.getStatusOs()));
+
+        double totalPecas = sincronizarPecasDaOs(os, dto.getPecas());
+        double totalServicos = sincronizarServicosDaOs(os, dto.getServicos());
+
+        os.setValorTotalPecas(totalPecas);
+        os.setValorTotalServico(totalServicos);
+        os.calcularValorTotal();
+
+        ordemDeServicoRepository.save(os);
+
+        return buscarDetalhePorId(os.getId());
+    }
+
+    public OrdemDeServico buscarPorId(Integer id) {
+        return ordemDeServicoRepository.findById(id).orElseThrow(() -> new RuntimeException("Ordem de Serviço não encontrada."));
+    }
+
+    public OrdemDeServicoDTO buscarDetalhePorId(Integer id) {
+        OrdemDeServico os = buscarPorId(id);
+
+        List<OsPeca> pecasEntity = osPecaRepository.findByOsId(id);
+        List<OsServico> servicosEntity = osServicoRepository.findByOsId(id);
+
+        return toDetalheDTO(os, pecasEntity, servicosEntity);
+    }
+
     public OrdemDeServicoDTO prepararOSApartirDeOrcamento(Integer idOrcamento) {
         Orcamento orcamento = orcamentoService.buscarPorId(idOrcamento);
 
@@ -70,6 +156,11 @@ public class OrdemDeServicoService {
         dto.setValorTotalPecas(orcamento.getValorTotalPecas());
         dto.setValorTotalServico(orcamento.getValorTotalServico());
         dto.setValorTotal(orcamento.getValorTotal());
+        dto.setOrcamentoId(orcamento.getId());
+        dto.setDesconto(0.0);
+        dto.setStatusOs("ABERTA");
+        dto.setDataAbertura(java.time.LocalDateTime.now());
+
 
         List<OsPecaDTO> listaPecas = new ArrayList<>();
         if (orcamento.getItensPecas() != null) {
@@ -103,94 +194,6 @@ public class OrdemDeServicoService {
         return dto;
     }
 
-    @Transactional
-    public OrdemDeServicoDTO salvar(OrdemDeServicoDTO dto) {
-        validarDtoDeEntrada(dto);
-
-        Cliente cliente = clienteRepository.findById(dto.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
-        Veiculo veiculo = veiculoRepository.findById(dto.getVeiculoId())
-                .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
-        Usuario tecnico = usuarioRepository.findById(dto.getTecnicoResponsavelId())
-                .orElseThrow(() -> new RuntimeException("Técnico responsável não encontrado."));
-
-        validarClienteEVeiculo(cliente, veiculo);
-
-        OrdemDeServico novaOs = new OrdemDeServico();
-        novaOs.setObservacoes(dto.getObservacoes());
-        novaOs.setCliente(cliente);
-        novaOs.setVeiculo(veiculo);
-        novaOs.setTecnicoResponsavel(tecnico);
-        novaOs.criarOs();
-
-        OrdemDeServico osSalva = ordemDeServicoRepository.save(novaOs);
-
-        double totalPecas = salvarPecasDaOs(osSalva, dto.getPecas());
-        double totalServicos = salvarServicosDaOs(osSalva, dto.getServicos());
-
-        osSalva.setValorTotalPecas(totalPecas);
-        osSalva.setValorTotalServico(totalServicos);
-        osSalva.calcularValorTotal();
-
-        OrdemDeServico osAtualizada = ordemDeServicoRepository.save(osSalva);
-        return buscarDetalhePorId(osAtualizada.getId());
-    }
-
-    @Transactional
-    public OrdemDeServicoDTO editar(Integer id, OrdemDeServicoDTO dto) {
-        validarDtoDeEntrada(dto);
-
-        OrdemDeServico os = buscarPorId(id);
-
-        if (os.getStatusOs() == StatusOsEnum.FECHADA) {
-            throw new RuntimeException("Não é possível editar uma OS fechada.");
-        }
-
-        Cliente cliente = clienteRepository.findById(dto.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
-        Veiculo veiculo = veiculoRepository.findById(dto.getVeiculoId())
-                .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
-        Usuario tecnico = usuarioRepository.findById(dto.getTecnicoResponsavelId())
-                .orElseThrow(() -> new RuntimeException("Técnico responsável não encontrado."));
-
-        validarClienteEVeiculo(cliente, veiculo);
-
-        os.setObservacoes(dto.getObservacoes());
-        os.setCliente(cliente);
-        os.setVeiculo(veiculo);
-        os.setTecnicoResponsavel(tecnico);
-
-        double totalPecas = sincronizarPecasDaOs(os, dto.getPecas());
-        double totalServicos = sincronizarServicosDaOs(os, dto.getServicos());
-
-        os.setValorTotalPecas(totalPecas);
-        os.setValorTotalServico(totalServicos);
-        os.calcularValorTotal();
-
-        ordemDeServicoRepository.save(os);
-
-        return buscarDetalhePorId(os.getId());
-    }
-
-    public List<OrdemDeServicoDTO> listarTodas() {
-        List<OrdemDeServico> ordens = ordemDeServicoRepository.findAll();
-        List<OrdemDeServicoDTO> lista = new ArrayList<>();
-
-        for (OrdemDeServico os : ordens) {
-            lista.add(toResumoDTO(os));
-        }
-
-        return lista;
-    }
-
-    public OrdemDeServicoDTO buscarDetalhePorId(Integer id) {
-        OrdemDeServico os = buscarPorId(id);
-
-        List<OsPeca> pecasEntity = osPecaRepository.findByOsId(id);
-        List<OsServico> servicosEntity = osServicoRepository.findByOsId(id);
-
-        return toDetalheDTO(os, pecasEntity, servicosEntity);
-    }
 
     public OrdemDeServicoDTO colocarEmAndamento(Integer id) {
         OrdemDeServico os = buscarPorId(id);
@@ -219,15 +222,9 @@ public class OrdemDeServicoService {
         return buscarDetalhePorId(id);
     }
 
-    public OrdemDeServico buscarPorId(Integer id) {
-        return ordemDeServicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ordem de Serviço não encontrada."));
-    }
 
     private void validarClienteEVeiculo(Cliente cliente, Veiculo veiculo) {
-        if (veiculo.getCliente() != null
-                && veiculo.getCliente().getId() != null
-                && !veiculo.getCliente().getId().equals(cliente.getId())) {
+        if (veiculo.getCliente() != null && veiculo.getCliente().getId() != null && !veiculo.getCliente().getId().equals(cliente.getId())) {
             throw new RuntimeException("O veículo informado não pertence ao cliente selecionado.");
         }
     }
@@ -247,17 +244,14 @@ public class OrdemDeServicoService {
                 throw new RuntimeException("Quantidade da peça deve ser maior que zero.");
             }
 
-            Peca peca = pecaRepository.findById(itemDto.getPecaId())
-                    .orElseThrow(() -> new RuntimeException("Peça não encontrada."));
+            Peca peca = pecaRepository.findById(itemDto.getPecaId()).orElseThrow(() -> new RuntimeException("Peça não encontrada."));
 
             OsPeca item = new OsPeca();
             item.setOs(os);
             item.setPeca(peca);
             item.setQuantidade(itemDto.getQuantidade());
 
-            Double valorUnitario = itemDto.getValorUnitario() != null
-                    ? itemDto.getValorUnitario()
-                    : peca.getValorUnitario();
+            Double valorUnitario = itemDto.getValorUnitario() != null ? itemDto.getValorUnitario() : peca.getValorUnitario();
 
             if (valorUnitario == null || valorUnitario < 0) {
                 throw new RuntimeException("Valor unitário da peça inválido.");
@@ -288,17 +282,14 @@ public class OrdemDeServicoService {
                 throw new RuntimeException("Quantidade do serviço deve ser maior que zero.");
             }
 
-            Servico servico = servicoRepository.findById(itemDto.getServicoId())
-                    .orElseThrow(() -> new RuntimeException("Serviço não encontrado."));
+            Servico servico = servicoRepository.findById(itemDto.getServicoId()).orElseThrow(() -> new RuntimeException("Serviço não encontrado."));
 
             OsServico item = new OsServico();
             item.setOs(os);
             item.setServico(servico);
             item.setQuantidade(itemDto.getQuantidade());
 
-            Double valorUnitario = itemDto.getValorUnitario() != null
-                    ? itemDto.getValorUnitario()
-                    : servico.getValor();
+            Double valorUnitario = itemDto.getValorUnitario() != null ? itemDto.getValorUnitario() : servico.getValor();
 
             if (valorUnitario == null || valorUnitario < 0) {
                 throw new RuntimeException("Valor unitário do serviço inválido.");
@@ -328,14 +319,12 @@ public class OrdemDeServicoService {
                     throw new RuntimeException("Quantidade da peça deve ser maior que zero.");
                 }
 
-                Peca peca = pecaRepository.findById(itemDto.getPecaId())
-                        .orElseThrow(() -> new RuntimeException("Peça não encontrada."));
+                Peca peca = pecaRepository.findById(itemDto.getPecaId()).orElseThrow(() -> new RuntimeException("Peça não encontrada."));
 
                 OsPeca item;
 
                 if (itemDto.getId() != null) {
-                    item = osPecaRepository.findById(itemDto.getId())
-                            .orElseThrow(() -> new RuntimeException("Item de peça não encontrado."));
+                    item = osPecaRepository.findById(itemDto.getId()).orElseThrow(() -> new RuntimeException("Item de peça não encontrado."));
 
                     if (item.getOs() == null || !item.getOs().getId().equals(os.getId())) {
                         throw new RuntimeException("O item de peça informado não pertence a esta OS.");
@@ -350,9 +339,7 @@ public class OrdemDeServicoService {
                 item.setPeca(peca);
                 item.setQuantidade(itemDto.getQuantidade());
 
-                Double valorUnitario = itemDto.getValorUnitario() != null
-                        ? itemDto.getValorUnitario()
-                        : peca.getValorUnitario();
+                Double valorUnitario = itemDto.getValorUnitario() != null ? itemDto.getValorUnitario() : peca.getValorUnitario();
 
                 if (valorUnitario == null || valorUnitario < 0) {
                     throw new RuntimeException("Valor unitário da peça inválido.");
@@ -394,14 +381,12 @@ public class OrdemDeServicoService {
                     throw new RuntimeException("Quantidade do serviço deve ser maior que zero.");
                 }
 
-                Servico servico = servicoRepository.findById(itemDto.getServicoId())
-                        .orElseThrow(() -> new RuntimeException("Serviço não encontrado."));
+                Servico servico = servicoRepository.findById(itemDto.getServicoId()).orElseThrow(() -> new RuntimeException("Serviço não encontrado."));
 
                 OsServico item;
 
                 if (itemDto.getId() != null) {
-                    item = osServicoRepository.findById(itemDto.getId())
-                            .orElseThrow(() -> new RuntimeException("Item de serviço não encontrado."));
+                    item = osServicoRepository.findById(itemDto.getId()).orElseThrow(() -> new RuntimeException("Item de serviço não encontrado."));
 
                     if (item.getOs() == null || !item.getOs().getId().equals(os.getId())) {
                         throw new RuntimeException("O item de serviço informado não pertence a esta OS.");
@@ -416,9 +401,7 @@ public class OrdemDeServicoService {
                 item.setServico(servico);
                 item.setQuantidade(itemDto.getQuantidade());
 
-                Double valorUnitario = itemDto.getValorUnitario() != null
-                        ? itemDto.getValorUnitario()
-                        : servico.getValor();
+                Double valorUnitario = itemDto.getValorUnitario() != null ? itemDto.getValorUnitario() : servico.getValor();
 
                 if (valorUnitario == null || valorUnitario < 0) {
                     throw new RuntimeException("Valor unitário do serviço inválido.");
@@ -482,6 +465,8 @@ public class OrdemDeServicoService {
         dto.setValorTotalPecas(os.getValorTotalPecas());
         dto.setValorTotalServico(os.getValorTotalServico());
         dto.setValorTotal(os.getValorTotal());
+        dto.setOrcamentoId(os.getOrcamentoId());
+        dto.setDesconto(os.getDesconto());
 
         if (os.getCliente() != null) {
             dto.setClienteId(os.getCliente().getId());
@@ -502,9 +487,7 @@ public class OrdemDeServicoService {
         return dto;
     }
 
-    private OrdemDeServicoDTO toDetalheDTO(OrdemDeServico os,
-                                           List<OsPeca> pecas,
-                                           List<OsServico> servicos) {
+    private OrdemDeServicoDTO toDetalheDTO(OrdemDeServico os, List<OsPeca> pecas, List<OsServico> servicos) {
         OrdemDeServicoDTO dto = toResumoDTO(os);
 
         List<OsPecaDTO> pecasDto = new ArrayList<>();
@@ -536,4 +519,20 @@ public class OrdemDeServicoService {
 
         return dto;
     }
+
+    private StatusOsEnum mapearStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return StatusOsEnum.ABERTA;
+        }
+
+        String valor = status.trim().toUpperCase();
+
+        return switch (valor) {
+            case "ABERTO", "ABERTA" -> StatusOsEnum.ABERTA;
+            case "EM ANDAMENTO", "EM_ANDAMENTO" -> StatusOsEnum.EM_ANDAMENTO;
+            case "FECHADA" -> StatusOsEnum.FECHADA;
+            default -> throw new RuntimeException("Status da OS inválido.");
+        };
+    }
+
 }

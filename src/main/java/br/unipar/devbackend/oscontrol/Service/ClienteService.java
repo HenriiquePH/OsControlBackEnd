@@ -22,46 +22,34 @@ public class ClienteService {
     @Autowired
     private CidadeService cidadeService;
 
-    // Cadastra um novo cliente
     public Cliente cadastrar(Cliente cliente) {
 
-        // Valida os campos obrigatórios
         validarCliente(cliente);
 
-        // Verifica se já existe cliente com o mesmo CPF
         if (clienteRepository.existsByCpf(cliente.getCpf())) {
             throw new RuntimeException("CPF já cadastrado.");
         }
 
-        // Busca a cidade real no banco antes de salvar
         ajustarCidadeDoEndereco(cliente);
 
-        // Vincula os veículos ao cliente antes de salvar
         vincularVeiculosAoCliente(cliente);
 
-        // Salva no banco
         return clienteRepository.save(cliente);
     }
 
-    // Edita um cliente já existente
     public Cliente editar(Integer id, Cliente clienteAtualizado) {
 
-        // Busca o cliente atual
         Cliente cliente = buscarPorId(id);
 
-        // Valida os novos dados
         validarCliente(clienteAtualizado);
 
-        // Verifica se o CPF foi alterado e se já existe outro com esse CPF
         if (!cliente.getCpf().equals(clienteAtualizado.getCpf())
                 && clienteRepository.existsByCpf(clienteAtualizado.getCpf())) {
             throw new RuntimeException("CPF já cadastrado.");
         }
 
-        // Busca a cidade real no banco antes de atualizar
         ajustarCidadeDoEndereco(clienteAtualizado);
 
-        // Atualiza os campos principais
         cliente.setNome(clienteAtualizado.getNome());
         cliente.setCpf(clienteAtualizado.getCpf());
         cliente.setTelefone(clienteAtualizado.getTelefone());
@@ -69,40 +57,31 @@ public class ClienteService {
         cliente.setEndereco(clienteAtualizado.getEndereco());
         cliente.setVeiculos(clienteAtualizado.getVeiculos());
 
-        // Garante que os veículos atualizados fiquem vinculados ao cliente
         vincularVeiculosAoCliente(cliente);
 
-        // Salva as alterações
         return clienteRepository.save(cliente);
     }
 
-    // Lista todos os clientes
     public List<Cliente> listarTodos() {
         return clienteRepository.findAll();
     }
 
-    // Busca um cliente pelo ID
     public Cliente buscarPorId(Integer id) {
         return clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
     }
 
-    // Exclui um cliente
     public void excluir(Integer id) {
 
-        // Busca o cliente primeiro
         Cliente cliente = buscarPorId(id);
 
-        // Verifica se existe OS vinculada a ele
         if (ordemDeServicoRepository.existsByClienteId(id)) {
             throw new RuntimeException("Cliente não pode ser excluído porque possui ordem de serviço.");
         }
 
-        // Exclui do banco
         clienteRepository.delete(cliente);
     }
 
-    // Método privado para validar os campos obrigatórios
     private void validarCliente(Cliente cliente) {
 
         if (cliente.getNome() == null || cliente.getNome().isBlank()) {
@@ -118,7 +97,6 @@ public class ClienteService {
         }
     }
 
-    // Busca a cidade real no banco e coloca no endereço
     private void ajustarCidadeDoEndereco(Cliente cliente) {
 
         if (cliente.getEndereco() != null &&

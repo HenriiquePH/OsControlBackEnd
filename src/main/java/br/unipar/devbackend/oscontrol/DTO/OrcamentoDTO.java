@@ -29,7 +29,6 @@ public class OrcamentoDTO {
         this.id = id;
     }
 
-
     public String getNomeOrcamento() {
         return nomeOrcamento;
     }
@@ -37,7 +36,6 @@ public class OrcamentoDTO {
     public void setNomeOrcamento(String nomeOrcamento) {
         this.nomeOrcamento = nomeOrcamento;
     }
-
 
     public LocalDateTime getDataCriacao() {
         return dataCriacao;
@@ -47,7 +45,6 @@ public class OrcamentoDTO {
         this.dataCriacao = dataCriacao;
     }
 
-
     public String getObservacao() {
         return observacao;
     }
@@ -55,7 +52,6 @@ public class OrcamentoDTO {
     public void setObservacao(String observacao) {
         this.observacao = observacao;
     }
-
 
     public Double getValorTotalPecas() {
         return valorTotalPecas;
@@ -65,7 +61,6 @@ public class OrcamentoDTO {
         this.valorTotalPecas = valorTotalPecas;
     }
 
-
     public Double getValorTotalServico() {
         return valorTotalServico;
     }
@@ -73,7 +68,6 @@ public class OrcamentoDTO {
     public void setValorTotalServico(Double valorTotalServico) {
         this.valorTotalServico = valorTotalServico;
     }
-
 
     public Double getValorTotal() {
         return valorTotal;
@@ -83,7 +77,6 @@ public class OrcamentoDTO {
         this.valorTotal = valorTotal;
     }
 
-
     public List<OrcamentoPecaDTO> getItensPecas() {
         return itensPecas;
     }
@@ -91,7 +84,6 @@ public class OrcamentoDTO {
     public void setItensPecas(List<OrcamentoPecaDTO> itensPecas) {
         this.itensPecas = itensPecas;
     }
-
 
     public List<OrcamentoServicoDTO> getItensServicos() {
         return itensServicos;

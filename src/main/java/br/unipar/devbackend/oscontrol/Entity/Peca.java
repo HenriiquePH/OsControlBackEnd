@@ -6,9 +6,6 @@ import jakarta.persistence.*;
 @Table(name = "peca")
 public class Peca {
 
-    // ==========================================
-    // ATRIBUTOS
-    // ==========================================
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -19,15 +16,9 @@ public class Peca {
     @Column
     private Double valorUnitario;
 
-    // ==========================================
-    // CONSTRUTOR
-    // ==========================================
     public Peca() {
     }
 
-    // ==========================================
-    // GETTERS E SETTERS (FORMATADOS)
-    // ==========================================
     public Integer getId() {
         return id;
     }

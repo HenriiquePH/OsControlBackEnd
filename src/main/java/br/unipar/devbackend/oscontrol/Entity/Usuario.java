@@ -1,5 +1,6 @@
 package br.unipar.devbackend.oscontrol.Entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -64,11 +65,10 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, unique = true)
     private String login;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String senha;
 
-    // Ajuste: Usar @Enumerated garante que o banco salve o texto (String) do Enum
-    // e evita erros de digitação no código.
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PerfilEnum perfil;

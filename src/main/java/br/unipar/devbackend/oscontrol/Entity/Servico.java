@@ -6,9 +6,6 @@ import jakarta.persistence.*;
 @Table(name = "servico")
 public class Servico {
 
-    // ==========================================
-    // ATRIBUTOS
-    // ==========================================
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -19,9 +16,6 @@ public class Servico {
     @Column
     private Double valor;
 
-    // ==========================================
-    // CONSTRUTOR
-    // ==========================================
     public Servico() {
     }
 

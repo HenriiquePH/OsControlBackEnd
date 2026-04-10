@@ -9,13 +9,9 @@ public class EnderecoCliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String rua;
-
     private String bairro;
-
     private String cep;
-
     private String complemento;
 
     @ManyToOne

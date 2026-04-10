@@ -7,7 +7,6 @@ public class VeiculoDTO {
     private String modelo;
     private String marca;
     private Integer ano;
-    private String cor;
 
     private Integer clienteId;
     private String clienteNome;
@@ -53,14 +52,6 @@ public class VeiculoDTO {
 
     public void setAno(Integer ano) {
         this.ano = ano;
-    }
-
-    public String getCor() {
-        return cor;
-    }
-
-    public void setCor(String cor) {
-        this.cor = cor;
     }
 
     public Integer getClienteId() {

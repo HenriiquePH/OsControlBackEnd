@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EnderecoClienteService {
     @Autowired
-    private EnderecoClienteRepository repository; // Nome igual à Entity
+    private EnderecoClienteRepository repository;
 
     public EnderecoCliente salvar(EnderecoCliente endereco) {
         return repository.save(endereco);

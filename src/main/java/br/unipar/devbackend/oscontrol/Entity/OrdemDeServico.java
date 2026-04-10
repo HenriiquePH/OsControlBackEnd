@@ -22,6 +22,9 @@ public class OrdemDeServico {
 
     private String observacoes;
 
+    private Integer orcamentoId;
+    private Double desconto = 0.0;
+
     private Double valorTotalPecas = 0.0;
     private Double valorTotalServico = 0.0;
     private Double valorTotal = 0.0;
@@ -64,8 +67,12 @@ public class OrdemDeServico {
     }
 
     public void calcularValorTotal() {
-        this.valorTotal = (this.valorTotalPecas != null ? this.valorTotalPecas : 0.0) +
+        double subtotal = (this.valorTotalPecas != null ? this.valorTotalPecas : 0.0) +
                 (this.valorTotalServico != null ? this.valorTotalServico : 0.0);
+
+        double valorDesconto = this.desconto != null ? this.desconto : 0.0;
+
+        this.valorTotal = Math.max(0.0, subtotal - valorDesconto);
     }
 
     public void adicionarPeca(Double valorPeca) {
@@ -119,6 +126,22 @@ public class OrdemDeServico {
 
     public void setObservacoes(String observacoes) {
         this.observacoes = observacoes;
+    }
+
+    public Integer getOrcamentoId() {
+        return orcamentoId;
+    }
+
+    public void setOrcamentoId(Integer orcamentoId) {
+        this.orcamentoId = orcamentoId;
+    }
+
+    public Double getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(Double desconto) {
+        this.desconto = desconto;
     }
 
     public Double getValorTotalPecas() {

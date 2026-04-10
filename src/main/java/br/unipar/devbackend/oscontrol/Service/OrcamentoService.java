@@ -24,6 +24,7 @@ public class OrcamentoService {
         Orcamento orcamento = buscarPorId(id);
 
         orcamento.setNomeOrcamento(orcamentoAtualizado.getNomeOrcamento());
+        orcamento.setDataCriacao(orcamentoAtualizado.getDataCriacao());
         orcamento.setObservacao(orcamentoAtualizado.getObservacao());
         orcamento.setItensPecas(orcamentoAtualizado.getItensPecas());
         orcamento.setItensServicos(orcamentoAtualizado.getItensServicos());
@@ -38,8 +39,7 @@ public class OrcamentoService {
     }
 
     public Orcamento buscarPorId(Integer id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Orçamento não encontrado. ID: " + id));
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Orçamento não encontrado. ID: " + id));
     }
 
     public List<Orcamento> buscarPorNome(String nome) {
@@ -57,11 +57,9 @@ public class OrcamentoService {
 
         if (orcamento.getItensServicos() != null) {
             for (OrcamentoServico servicoItem : orcamento.getItensServicos()) {
-                double valorUnitario = servicoItem.getValorUnitario() != null
-                        ? servicoItem.getValorUnitario() : 0.0;
+                double valorUnitario = servicoItem.getValorUnitario() != null ? servicoItem.getValorUnitario() : 0.0;
 
-                int quantidade = servicoItem.getQuantidade() != null
-                        ? servicoItem.getQuantidade() : 0;
+                int quantidade = servicoItem.getQuantidade() != null ? servicoItem.getQuantidade() : 0;
 
                 double totalItem = valorUnitario * quantidade;
                 servicoItem.setValorTotal(totalItem);
@@ -71,11 +69,9 @@ public class OrcamentoService {
 
         if (orcamento.getItensPecas() != null) {
             for (OrcamentoPeca pecaItem : orcamento.getItensPecas()) {
-                double valorUnitario = pecaItem.getValorUnitario() != null
-                        ? pecaItem.getValorUnitario() : 0.0;
+                double valorUnitario = pecaItem.getValorUnitario() != null ? pecaItem.getValorUnitario() : 0.0;
 
-                int quantidade = pecaItem.getQuantidade() != null
-                        ? pecaItem.getQuantidade() : 0;
+                int quantidade = pecaItem.getQuantidade() != null ? pecaItem.getQuantidade() : 0;
 
                 double totalItem = valorUnitario * quantidade;
                 pecaItem.setValorTotal(totalItem);

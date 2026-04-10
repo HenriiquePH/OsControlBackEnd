@@ -12,6 +12,9 @@ public class OrdemDeServicoDTO {
     private String statusOs;
     private String observacoes;
 
+    private Integer orcamentoId;
+    private Double desconto;
+
     private Double valorTotalPecas;
     private Double valorTotalServico;
     private Double valorTotal;
@@ -167,4 +170,21 @@ public class OrdemDeServicoDTO {
     public void setServicos(List<OsServicoDTO> servicos) {
         this.servicos = servicos;
     }
+
+    public Integer getOrcamentoId() {
+        return orcamentoId;
+    }
+
+    public void setOrcamentoId(Integer orcamentoId) {
+        this.orcamentoId = orcamentoId;
+    }
+
+    public Double getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(Double desconto) {
+        this.desconto = desconto;
+    }
+
 }

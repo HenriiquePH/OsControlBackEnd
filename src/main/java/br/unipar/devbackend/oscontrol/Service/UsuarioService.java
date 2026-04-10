@@ -3,6 +3,7 @@ package br.unipar.devbackend.oscontrol.Service;
 import br.unipar.devbackend.oscontrol.Entity.Usuario;
 import br.unipar.devbackend.oscontrol.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,22 +14,29 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository repository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Usuario cadastrar(Usuario usuario) {
-        validarUsuario(usuario);
+        validarUsuario(usuario, true);
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         return repository.save(usuario);
     }
 
     public Usuario editar(Integer id, Usuario usuarioAtualizado) {
         Usuario usuario = buscarPorId(id);
 
-        validarUsuario(usuarioAtualizado);
+        validarUsuario(usuarioAtualizado,false);
 
         usuario.setNome(usuarioAtualizado.getNome());
         usuario.setLogin(usuarioAtualizado.getLogin());
-        usuario.setSenha(usuarioAtualizado.getSenha());
         usuario.setPerfil(usuarioAtualizado.getPerfil());
         usuario.setCpf(usuarioAtualizado.getCpf());
         usuario.setTelefone(usuarioAtualizado.getTelefone());
+
+        if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
+        }
 
         return repository.save(usuario);
     }
@@ -47,24 +55,23 @@ public class UsuarioService {
         repository.delete(usuario);
     }
 
-    private void validarUsuario(Usuario usuario) {
+    private void validarUsuario(Usuario usuario, boolean senhaObrigatoria) {
+
         if (usuario.getNome() == null || usuario.getNome().isBlank()) {
             throw new RuntimeException("Nome é obrigatório.");
         }
         if (usuario.getLogin() == null || usuario.getLogin().isBlank()) {
             throw new RuntimeException("Login é obrigatório.");
         }
-        if (usuario.getSenha() == null || usuario.getSenha().isBlank()) {
+        if (senhaObrigatoria && (usuario.getSenha() == null || usuario.getSenha().isBlank())) {
             throw new RuntimeException("Senha é obrigatória.");
         }
         if (usuario.getPerfil() == null) {
             throw new RuntimeException("Perfil é obrigatório.");
         }
-
         if (usuario.getCpf() == null || usuario.getCpf().isBlank()) {
             throw new RuntimeException("CPF é obrigatório.");
         }
-
         if (usuario.getTelefone() == null || usuario.getTelefone().isBlank()) {
             throw new RuntimeException("Telefone é obrigatório.");
         }

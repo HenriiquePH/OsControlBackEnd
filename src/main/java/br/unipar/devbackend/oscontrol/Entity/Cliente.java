@@ -32,7 +32,6 @@ public class Cliente {
         this.endereco = endereco;
     }
 
-    // Getter e Setter para o campo veiculos (Necessário para a regra de negócio)
     public List<Veiculo> getVeiculos() {
         return veiculos;
     }
@@ -41,11 +40,9 @@ public class Cliente {
         this.veiculos = veiculos;
     }
 
-    // Construtor Vazio (Obrigatório pelo JPA)
     public Cliente() {
     }
 
-    // Construtor com campos (Útil para criar objetos rápido)
     public Cliente(Integer id, String nome, String cpf, String telefone, String email) {
         this.id = id;
         this.nome = nome;
