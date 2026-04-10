@@ -7,9 +7,6 @@ import java.time.LocalDateTime;
 @Table(name = "os")
 public class OrdemDeServico {
 
-    // ==========================================
-    // ATRIBUTOS
-    // ==========================================
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -29,7 +26,6 @@ public class OrdemDeServico {
     private Double valorTotalServico = 0.0;
     private Double valorTotal = 0.0;
 
-    // Relacionamentos
     @ManyToOne
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
