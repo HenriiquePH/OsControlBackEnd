@@ -19,9 +19,6 @@ public class Servico {
     public Servico() {
     }
 
-    // ==========================================
-    // GETTERS E SETTERS (FORMATADOS)
-    // ==========================================
     public Integer getId() {
         return id;
     }

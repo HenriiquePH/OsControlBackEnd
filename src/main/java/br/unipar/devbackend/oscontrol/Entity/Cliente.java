@@ -1,7 +1,7 @@
 package br.unipar.devbackend.oscontrol.Entity;
 
 import jakarta.persistence.*;
-import java.util.List; // Importação necessária para a lista de veículos
+import java.util.List;
 
 @Entity
 @Table(name = "cliente")

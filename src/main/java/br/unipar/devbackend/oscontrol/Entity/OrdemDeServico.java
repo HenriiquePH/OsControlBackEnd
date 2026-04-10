@@ -42,15 +42,8 @@ public class OrdemDeServico {
     @JoinColumn(name = "id_responsavel_tecnico")
     private Usuario tecnicoResponsavel;
 
-    // ==========================================
-    // CONSTRUTOR
-    // ==========================================
     public OrdemDeServico() {
     }
-
-    // ==========================================
-    // MÉTODOS DE NEGÓCIO DO DIAGRAMA
-    // ==========================================
 
     public void criarOs() {
         this.statusOs = StatusOsEnum.ABERTA;
@@ -85,9 +78,6 @@ public class OrdemDeServico {
         calcularValorTotal();
     }
 
-    // ==========================================
-    // GETTERS E SETTERS (SCANNABLE)
-    // ==========================================
     public Integer getId() {
         return id;
     }
@@ -170,6 +160,7 @@ public class OrdemDeServico {
     public Cliente getCliente() {
         return cliente;
     }
+
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
