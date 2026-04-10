@@ -111,7 +111,6 @@ public class ClienteService {
         }
     }
 
-    // Faz cada veículo apontar para o cliente
     private void vincularVeiculosAoCliente(Cliente cliente) {
 
         if (cliente.getVeiculos() != null) {
