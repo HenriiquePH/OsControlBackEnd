@@ -13,6 +13,9 @@ public class Estado {
     @Column(nullable = false, length = 30)
     private String nome;
 
+    @Column(length = 2)
+    private String uf;
+
     public Estado() {
     }
 
@@ -30,5 +33,13 @@ public class Estado {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public String getUf() {
+        return uf;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
     }
 }

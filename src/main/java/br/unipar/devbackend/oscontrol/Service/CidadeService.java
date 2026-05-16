@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CidadeService {
@@ -19,6 +20,14 @@ public class CidadeService {
 
     public Cidade buscarPorId(Integer id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cidade não encontrada."));
+                .orElseThrow(() -> new RuntimeException("Cidade nao encontrada."));
+    }
+
+    public Optional<Cidade> buscarPorNomeEEstado(String nome, Integer estadoId) {
+        return repository.findByNomeIgnoreCaseAndEstado_Id(nome, estadoId);
+    }
+
+    public Cidade salvar(Cidade cidade) {
+        return repository.save(cidade);
     }
 }

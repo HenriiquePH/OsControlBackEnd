@@ -19,6 +19,7 @@ public class Veiculo {
     private String marca;
     private Integer ano;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
