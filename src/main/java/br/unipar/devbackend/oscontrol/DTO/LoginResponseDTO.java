@@ -1,4 +1,4 @@
 package br.unipar.devbackend.oscontrol.DTO;
 
-public record LoginResponseDTO(String token) {
+public record LoginResponseDTO(String token, String perfil) {
 }

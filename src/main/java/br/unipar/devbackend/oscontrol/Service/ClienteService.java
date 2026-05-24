@@ -167,7 +167,6 @@ public class ClienteService {
         novoEstado.setNome(nome);
         return estadoService.salvar(novoEstado);
     }
-
     private Cidade resolverCidade(Cidade cidadeInformada, Estado estado) {
         String nomeCidade = limparTexto(cidadeInformada.getNome());
 
