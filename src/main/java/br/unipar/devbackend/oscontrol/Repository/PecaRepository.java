@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PecaRepository extends JpaRepository<Peca, Integer> {
+
+    boolean existsByDescricao(String descricao);
 }

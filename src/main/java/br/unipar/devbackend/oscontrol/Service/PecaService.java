@@ -22,7 +22,11 @@ public class PecaService {
     private void validarPeca(Peca peca) {
 
         if (peca.getDescricao() == null || peca.getDescricao().isBlank()) {
-            throw new RuntimeException("Descrição da peça é obrigatória.");
+            throw new RuntimeException("Nome da peça é obrigatória.");
+        }
+
+        if (repository.existsByDescricao(peca.getDescricao())) {
+            throw new RuntimeException("Já existe uma peça cadastrada com esse nome.");
         }
 
         if (peca.getValorUnitario() == null || peca.getValorUnitario() <= 0) {

@@ -16,12 +16,15 @@ public class OrcamentoService {
     private OrcamentoRepository repository;
 
     public Orcamento cadastrar(Orcamento orcamento) {
+        validarOrcamento(orcamento);
         calcularTotais(orcamento);
         return repository.save(orcamento);
     }
 
     public Orcamento editar(Integer id, Orcamento orcamentoAtualizado) {
         Orcamento orcamento = buscarPorId(id);
+
+        validarOrcamento(orcamentoAtualizado);
 
         orcamento.setNomeOrcamento(orcamentoAtualizado.getNomeOrcamento());
         orcamento.setDataCriacao(orcamentoAtualizado.getDataCriacao());
@@ -49,6 +52,24 @@ public class OrcamentoService {
     public void excluir(Integer id) {
         Orcamento orcamento = buscarPorId(id);
         repository.delete(orcamento);
+    }
+
+    private void validarOrcamento(Orcamento orcamento) {
+
+        if (orcamento.getNomeOrcamento() == null || orcamento.getNomeOrcamento().isBlank()) {
+            throw new RuntimeException("Preencha os campos obrigatorios.");
+        }
+
+        if (orcamento.getDataCriacao() == null) {
+            throw new RuntimeException("Preencha os campos obrigatorios.");
+        }
+
+        boolean semPecas = orcamento.getItensPecas() == null || orcamento.getItensPecas().isEmpty();
+        boolean semServicos = orcamento.getItensServicos() == null || orcamento.getItensServicos().isEmpty();
+
+        if (semPecas && semServicos) {
+            throw new RuntimeException("Informe pelo menos um servico ou produto para criar o orcamento.");
+        }
     }
 
     private void calcularTotais(Orcamento orcamento) {

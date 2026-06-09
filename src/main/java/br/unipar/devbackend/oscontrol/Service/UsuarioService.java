@@ -39,6 +39,7 @@ public class UsuarioService {
         }
 
         return repository.save(usuario);
+
     }
 
     public List<Usuario> listarTodos() {
@@ -52,7 +53,12 @@ public class UsuarioService {
 
     public void excluir(Integer id) {
         Usuario usuario = buscarPorId(id);
-        repository.delete(usuario);
+
+        try {
+            repository.delete(usuario);
+        } catch (Exception e) {
+            throw new RuntimeException("A exclusão não pode ser realizada. Mecânico está vinculado a uma OS em aberto.");
+        }
     }
 
     private void validarUsuario(Usuario usuario, boolean senhaObrigatoria) {
