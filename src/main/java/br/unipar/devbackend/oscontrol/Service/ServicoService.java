@@ -58,8 +58,7 @@ public class ServicoService {
     }
 
     public Servico buscarPorId(Integer id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Serviço não encontrado."));
+        return repository.findById(id).get();
     }
 
     public void excluirServico(Integer id) {

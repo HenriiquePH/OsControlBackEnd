@@ -37,8 +37,6 @@ public class PecaService {
     public Peca atualizar(Integer id, Peca pecaAtualizada) {
         Peca peca = buscarPorId(id);
 
-        validarPeca(pecaAtualizada);
-
         peca.setDescricao(pecaAtualizada.getDescricao());
         peca.setValorUnitario(pecaAtualizada.getValorUnitario());
 

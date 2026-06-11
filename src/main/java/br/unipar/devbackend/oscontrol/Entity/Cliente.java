@@ -14,7 +14,6 @@ public class Cliente {
     private String nome;
     private String cpf;
     private String telefone;
-    private String email;
 
     @OneToOne(cascade = CascadeType.ALL)
     private EnderecoCliente endereco;
@@ -48,7 +47,6 @@ public class Cliente {
         this.nome = nome;
         this.cpf = cpf;
         this.telefone = telefone;
-        this.email = email;
     }
 
     public Integer getId() {
@@ -81,13 +79,5 @@ public class Cliente {
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

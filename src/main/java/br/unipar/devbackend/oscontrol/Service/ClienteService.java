@@ -59,7 +59,6 @@ public class ClienteService {
         cliente.setNome(clienteAtualizado.getNome());
         cliente.setCpf(clienteAtualizado.getCpf());
         cliente.setTelefone(clienteAtualizado.getTelefone());
-        cliente.setEmail(clienteAtualizado.getEmail());
         cliente.setEndereco(clienteAtualizado.getEndereco());
         cliente.setVeiculos(clienteAtualizado.getVeiculos());
 
